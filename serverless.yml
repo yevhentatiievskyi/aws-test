@@ -1,0 +1,59 @@
+service: senior-test-dev
+
+custom:
+  songsBucket: senior-test-dev-songs
+  trimBucket: senior-test-dev-trim
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - "s3:Put*"
+        - "s3:GetObject"
+        - "s3:DeleteObject"
+      Resource:
+        Fn::Join:
+          - ""
+          - - 'arn:aws:s3:::${self:custom.songsBucket}/*'
+  environment:
+    BUCKET_TRIM_SONGS: ${self:custom.trimBucket}
+    BUCKET_UPLOAD_SONGS: ${self:custom.songsBucket}
+
+plugins:
+  - serverless-offline
+
+functions:
+  get_upload_url:
+    handler: get-upload-url.handler
+  trim_song:
+    handler: trim-song.handler
+    events:
+      - s3:
+          bucket: ${self:custom.songsBucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .mp3
+    layers:
+      - { Ref: FfmpegLambdaLayer }
+  get_song_urls:
+    handler: get-song-urls.handler
+
+resources:
+  Resources:
+    SongsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+#        BucketName: ${self:custom.songsBucket}
+        AccessControl: PublicRead
+
+layers:
+  ffmpeg:
+    path: layer
