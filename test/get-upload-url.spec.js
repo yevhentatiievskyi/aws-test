@@ -1,7 +1,7 @@
-const handler = require('./get-upload-url').handler;
-const getUrl = require('./get-url');
+const handler = require('../src/get-upload-url/get-upload-url').handler;
+const getUrl = require('../src/utils/get-url');
 
-jest.mock('./get-url');
+jest.mock('../src/utils/get-url');
 
 describe('get_upload_url function', () => {
     const mockEvent = {};

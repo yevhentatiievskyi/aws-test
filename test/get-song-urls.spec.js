@@ -1,8 +1,8 @@
-const handler = require('./get-song-urls').handler;
+const handler = require('../src/get-song-urls/get-song-urls').handler;
 const AWS = require('aws-sdk');
-const getUrl = require('./get-url');
+const getUrl = require('../src/utils/get-url');
 
-jest.mock('./get-url');
+jest.mock('../src/utils/get-url');
 
 describe('get_song_urls function', () => {
     process.env.BUCKET_TRIM_SONGS = 'trim_songs';

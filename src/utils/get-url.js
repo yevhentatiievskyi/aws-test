@@ -28,13 +28,9 @@ module.exports = async (e) => {
 
   const { fileName, fileType } = safeJSONParser(e.body);
 
-  const nameFile = fileName.split('.').slice(0, -1).join('.');
-
-  const key = `${ nameFile }.${ fileType.split('/')[ 1 ] }`;
-
   const s3Params = {
     Bucket:      process.env.BUCKET_UPLOAD_SONGS,
-    Key:         key,
+    Key:         fileName,
     ContentType: fileType,
     ACL:         'public-read'
   };
@@ -43,7 +39,7 @@ module.exports = async (e) => {
 
   return {
     url: result,
-    key
+    key: fileName
   };
 }
 

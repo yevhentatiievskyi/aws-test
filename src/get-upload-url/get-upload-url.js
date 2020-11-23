@@ -1,5 +1,5 @@
 'use strict';
-const getUrl = require('./get-url');
+const getUrl = require('../utils/get-url');
 
 module.exports.handler = async event => {
   return {

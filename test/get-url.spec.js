@@ -1,4 +1,4 @@
-const getUrl = require('./get-url');
+const getUrl = require('../src/utils/get-url');
 const AWS = require('aws-sdk');
 
 describe('get-url module', () => {

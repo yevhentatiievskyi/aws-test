@@ -1,6 +1,6 @@
 'use strict';
 const AWS = require('aws-sdk');
-const getUrl = require('./get-url');
+const getUrl = require('../utils/get-url');
 
 module.exports.handler = async () => {
     const s3 = new AWS.S3();

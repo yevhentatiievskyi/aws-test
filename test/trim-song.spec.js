@@ -1,4 +1,4 @@
-const handler = require('./trim-song').handler;
+const handler = require('../src/trim-song/trim-song').handler;
 const fs = require('fs');
 const AWS = require('aws-sdk');
 const ffmpeg = require('fluent-ffmpeg');

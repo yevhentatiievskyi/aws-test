@@ -9,6 +9,7 @@ provider:
   runtime: nodejs10.x
   stage: dev
   region: us-east-1
+  environment: ${file(./serverless.env.yml):environment}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -22,19 +23,44 @@ provider:
       Resource:
         Fn::Join:
           - ""
-          - - 'arn:aws:s3:::${self:custom.songsBucket}/*'
-  environment:
-    BUCKET_TRIM_SONGS: ${self:custom.trimBucket}
-    BUCKET_UPLOAD_SONGS: ${self:custom.songsBucket}
+          - - 'arn:aws:s3:::'
+            - ${self:custom.songsBucket}
+            - '/*'
+    - Effect: Allow
+      Action:
+        - "s3:Put*"
+        - "s3:GetObject"
+        - "s3:DeleteObject"
+      Resource:
+        Fn::Join:
+          - ""
+          - - 'arn:aws:s3:::'
+            - ${self:custom.trimBucket}
+            - '/*'
+    - Effect: Allow
+      Action:
+        - "s3:ListBucket"
+        - "s3:ListObjects"
+        - "s3:ListObjectsV2"
+      Resource:
+        Fn::Join:
+          - ""
+          - - 'arn:aws:s3:::'
+            - ${self:custom.trimBucket}
 
 plugins:
   - serverless-offline
 
 functions:
   get_upload_url:
-    handler: get-upload-url.handler
+    handler: handlers.getUploadUrl
+    events:
+      - http:
+          path: songs/get_upload_url
+          method: post
+
   trim_song:
-    handler: trim-song.handler
+    handler: handlers.trimSong
     events:
       - s3:
           bucket: ${self:custom.songsBucket}
@@ -43,15 +69,20 @@ functions:
             - suffix: .mp3
     layers:
       - { Ref: FfmpegLambdaLayer }
+
   get_song_urls:
-    handler: get-song-urls.handler
+    handler: handlers.getSongUrls
+    events:
+      - http:
+          path: songs/get_song_urls
+          method: get
 
 resources:
   Resources:
-    SongsBucket:
+    TrimBucket:
       Type: AWS::S3::Bucket
       Properties:
-#        BucketName: ${self:custom.songsBucket}
+        BucketName: ${self:custom.trimBucket}
         AccessControl: PublicRead
 
 layers:
